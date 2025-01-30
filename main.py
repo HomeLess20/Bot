@@ -1,5 +1,3 @@
-Python
-
 # main.py
 import os
 import discord
