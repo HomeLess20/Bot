@@ -1,15 +1,15 @@
-# main.py
 import os
 import discord
 from discord.ext import commands
 from discord import app_commands
+import asyncio  # เพิ่ม import asyncio
 
 from myserver import server_on
 
 # กำหนด intents ที่จำเป็น
 intents = discord.Intents.default()
 intents.message_content = True  # เปิดใช้งานถ้าบอทต้องการอ่านข้อความ
-intents.members = True # เปิดใช้งานถ้าบอทต้องการเข้าถึงข้อมูลสมาชิก
+intents.members = True  # เปิดใช้งานถ้าบอทต้องการเข้าถึงข้อมูลสมาชิก (ถ้าจำเป็น)
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 
@@ -22,11 +22,11 @@ async def on_ready():
 async def hello(interaction: discord.Interaction):
     await interaction.response.send_message("Hello!")
 
-# Sync slash commands globally (once is enough, you can comment it out after the first sync)
-# async def main():
-#     await bot.tree.sync()
+# Sync slash commands globally (ทำครั้งเดียว)
+async def main():
+    await bot.tree.sync()
 
-# asyncio.run(main())
+asyncio.run(main())  # รัน asyncio main
 
-server_on()
+server_on()  # รัน web server (ถ้าจำเป็น)
 bot.run(os.getenv('TOKEN'))
