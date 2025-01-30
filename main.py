@@ -24,4 +24,8 @@ async def hello(ctx):
 
 
 server_on()  # รัน web server (ถ้าจำเป็น)
-bot.run(os.getenv('TOKEN'))
+token = os.getenv('TOKEN')
+if token:
+    bot.run(token)
+else:
+    print("Error: Discord bot token not found. Please set the TOKEN environment variable.")
