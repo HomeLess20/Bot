@@ -27,9 +27,23 @@ AUDIO_PATH = "/song"  # 🔹 เปลี่ยนเป็นที่อยู
 @bot.event
 async def on_ready():
     print(f"✅ {bot.user} has connected to Discord!")
+    await join_voice_channel()  # เชื่อมต่อห้องเสียงเมื่อบอทพร้อม
     play_sound_at_time.start()  # เริ่ม Task ตรวจสอบเวลาเล่นเสียง
 
-@tasks.loop(seconds=30)  # 🔹 ตรวจสอบเวลาทุก 30 วินาที
+async def join_voice_channel():
+    """เชื่อมต่อกับห้องเสียงโดยไม่ออกจากห้อง"""
+    channel = bot.get_channel(VOICE_CHANNEL_ID)
+    if channel and isinstance(channel, discord.VoiceChannel):
+        try:
+            # เชื่อมต่อห้องเสียง
+            vc = await channel.connect()
+            print(f"✅ บอทเข้าห้องเสียง {channel.name} แล้ว")
+        except Exception as e:
+            print(f"❌ Error joining voice channel: {e}")
+    else:
+        print(f"❌ Voice Channel ID {VOICE_CHANNEL_ID} ไม่ถูกต้อง")
+
+@tasks.loop(seconds=2)  # 🔹 ตรวจสอบเวลาทุก 2 วินาที
 async def play_sound_at_time():
     """ตรวจสอบเวลาและเล่นเสียงตามกำหนด"""
     now = datetime.datetime.now(tz_thailand).time()
@@ -40,16 +54,17 @@ async def play_sound_at_time():
             await asyncio.sleep(60)  # ป้องกันการเล่นซ้ำใน 1 นาที
 
 async def play_audio(audio_file):
-    """เข้าห้องเสียงและเล่นไฟล์"""
+    """เล่นไฟล์เสียงในห้องเสียง"""
     channel = bot.get_channel(VOICE_CHANNEL_ID)
 
     if channel and isinstance(channel, discord.VoiceChannel):
         try:
-            vc = await channel.connect()
-            vc.play(discord.FFmpegPCMAudio(audio_file), after=lambda e: print(f"✅ เล่น {audio_file} เสร็จแล้ว"))
-            while vc.is_playing():
-                await asyncio.sleep(1)
-            await vc.disconnect()
+            # เช็คห้องเสียงที่เชื่อมต่ออยู่
+            vc = channel.guild.voice_client
+            if vc is not None and not vc.is_playing():
+                vc.play(discord.FFmpegPCMAudio(audio_file), after=lambda e: print(f"✅ เล่น {audio_file} เสร็จแล้ว"))
+                while vc.is_playing():
+                    await asyncio.sleep(1)
         except Exception as e:
             print(f"❌ Error playing sound: {e}")
     else:
