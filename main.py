@@ -1,7 +1,6 @@
 import os
 import discord
 from discord.ext import commands
-from discord import app_commands
 import asyncio
 
 from myserver import server_on  # ถ้าจำเป็นต้องใช้
@@ -45,7 +44,7 @@ async def on_message(message):
 async def main():
     await bot.tree.sync()
 
-asyncio.run(main())  # รัน asyncio main
+
 
 server_on()  # รัน web server (ถ้าจำเป็น)
 bot.run(os.getenv('TOKEN'))
