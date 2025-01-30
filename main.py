@@ -10,6 +10,10 @@ bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
 
 
 # ส่วนของการเรียกใช้งานคำสั่ง
+@bot.event
+async def on_ready():
+    print("Bot is ready!")
+  
 
 
 server_on()
