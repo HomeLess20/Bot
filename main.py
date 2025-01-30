@@ -1,7 +1,6 @@
 import os
 import discord
 from discord.ext import commands
-from discord import app_commands
 import asyncio  # เพิ่ม import asyncio
 
 from myserver import server_on
@@ -21,6 +20,18 @@ async def on_ready():
 @bot.tree.command(name="hello", description="Say hello!")
 async def hello(interaction: discord.Interaction):
     await interaction.response.send_message("Hello!")
+
+@bot.event
+async def on_message(message):
+    # ตรวจสอบว่าข้อความนั้นมาจากบอทเองหรือไม่ ถ้าใช่ ไม่ต้องทำอะไร
+    if message.author == bot.user:
+        return
+
+    mes = message.content  # ดึงข้อความที่ผู้ใช้ส่งมา
+
+    if mes == 'hello':
+        await message.channel.send("Hello It's me")  # ส่งข้อความตอบกลับไปที่แชนแนลเดิม
+
 
 # Sync slash commands globally (ทำครั้งเดียว)
 async def main():
