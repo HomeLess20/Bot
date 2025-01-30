@@ -1,118 +1,74 @@
 import os
 import discord
-from discord.ext import commands
+import asyncio
+import datetime
+import pytz
+from discord.ext import commands, tasks
 from discord import app_commands
 
-from myserver import server_on
+from myserver import server_on  # ใช้ถ้ารันบน Replit/Heroku
 
 bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
 
+# 🔹 กำหนดโซนเวลาไทย
+tz_thailand = pytz.timezone("Asia/Bangkok")
 
+# 🔹 กำหนดเวลาและไฟล์เสียง
+play_schedule = {
+    datetime.time(0, 8): "/song/Fe!n - Travis Scott ft.Playboi carti ｜｜ [edit audio].mp3",   #  เล่นตอน
+    datetime.time(12, 0): "lunch.mp3",    # เล่นตอน 12:00 น.
+    datetime.time(18, 0): "evening.mp3"   # เล่นตอน 18:00 น.
+}
+
+VOICE_CHANNEL_ID = 865206316476530708  # 🔹 ใส่ ID ของห้องเสียง
+AUDIO_PATH = "/song"  # 🔹 เปลี่ยนเป็นที่อยู่ไฟล์จริง
 
 # //////////////////// Bot Event /////////////////////////
-# คำสั่ง bot พร้อมใช้งานแล้ว
 @bot.event
 async def on_ready():
-    print("Bot Online!")
-    print("555")
-    synced = await bot.tree.sync()
-    print(f"{len(synced)} command(s)")
+    print(f"✅ {bot.user} has connected to Discord!")
+    play_sound_at_time.start()  # เริ่ม Task ตรวจสอบเวลาเล่นเสียง
 
+@tasks.loop(seconds=30)  # 🔹 ตรวจสอบเวลาทุก 30 วินาที
+async def play_sound_at_time():
+    """ตรวจสอบเวลาและเล่นเสียงตามกำหนด"""
+    now = datetime.datetime.now(tz_thailand).time()
 
+    for play_time, sound_file in play_schedule.items():
+        if now.hour == play_time.hour and now.minute == play_time.minute:
+            await play_audio(sound_file)
+            await asyncio.sleep(60)  # ป้องกันการเล่นซ้ำใน 1 นาที
 
+async def play_audio(audio_file):
+    """เข้าห้องเสียงและเล่นไฟล์"""
+    channel = bot.get_channel(VOICE_CHANNEL_ID)
 
-# แจ้งคนเข้า -ออกเซิฟเวอร์
-
-@bot.event
-async def on_member_join(member):
-    channel = bot.get_channel(1140633489520205934) # IDห้อง
-    text = f"Welcome to the server, {member.mention}!"
-
-    emmbed = discord.Embed(title = 'Welcome to the server!',
-                           description = text,
-                           color = 0x66FFFF)
-
-    await channel.send(text) # ส่งข้อความไปที่ห้องนี้
-    await channel.send(embed = emmbed)  # ส่ง Embed ไปที่ห้องนี้
-    await member.send(text) # ส่งข้อความไปที่แชทส่วนตัวของ member
-
-
-@bot.event
-async def on_member_remove(member):
-    channel = bot.get_channel(1140633489520205934)  # IDห้อง
-    text = f"{member.name} has left the server!"
-    await channel.send(text)  # ส่งข้อความไปที่ห้องนี้
-
-
-
-# คำสั่ง chatbot
-@bot.event
-async def on_message(message):
-    mes = message.content # ดึงข้อความที่ถูกส่งมา
-    if mes == 'hello':
-        await message.channel.send("Hello It's me") # ส่งกลับไปที่ห้องนั่น
-
-    elif mes == 'hi bot':
-        await message.channel.send("Hello, " + str(message.author.name))
-
-    await bot.process_commands(message)
-    # ทำคำสั่ง event แล้วไปทำคำสั่ง bot command ต่อ
-
-
-
+    if channel and isinstance(channel, discord.VoiceChannel):
+        try:
+            vc = await channel.connect()
+            vc.play(discord.FFmpegPCMAudio(audio_file), after=lambda e: print(f"✅ เล่น {audio_file} เสร็จแล้ว"))
+            while vc.is_playing():
+                await asyncio.sleep(1)
+            await vc.disconnect()
+        except Exception as e:
+            print(f"❌ Error playing sound: {e}")
+    else:
+        print(f"❌ Voice Channel ID {VOICE_CHANNEL_ID} ไม่ถูกต้อง")
 
 # ///////////////////// Commands /////////////////////
-# กำหนดคำสั่งให้บอท
-
 @bot.command()
 async def hello(ctx):
     await ctx.send(f"hello {ctx.author.name}!")
 
-
 @bot.command()
 async def test(ctx, arg):
     await ctx.send(arg)
-
 
 # Slash Commands
 @bot.tree.command(name='hellobot', description='Replies with Hello')
 async def hellocommand(interaction):
     await interaction.response.send_message("Hello It's me BOT DISCORD")
 
-
-@bot.tree.command(name='name')
-@app_commands.describe(name = "What's your name?")
-async def namecommand(interaction, name : str):
-    await interaction.response.send_message(f"Hello {name}")
-
-
-# Embeds
-
-@bot.tree.command(name='help', description='Bot Commands')
-async def helpcommand(interaction):
-    emmbed = discord.Embed(title='Help Me! - Bot Commands',
-                           description='Bot Commands',
-                           color=0x66FFFF,
-                           timestamp= discord.utils.utcnow())
-
-
-    # ใส่ข้อมูล
-    emmbed.add_field(name='/hello1', value='Hello Commmand', inline=True)
-    emmbed.add_field(name='/hello2', value='Hello Commmand', inline=True)
-    emmbed.add_field(name='/hello3', value='Hello Commmand', inline=False)
-
-    emmbed.set_author(name='Author', url='https://www.youtube.com/@maoloop01/channels', icon_url='https://yt3.googleusercontent.com/0qFq3tGT6LVyfLtZc-WCXcV9YyEFQ0M9U5W8qDe36j2xBTN34CJ20dZYQHmBz6aXASmttHI=s900-c-k-c0x00ffffff-no-rj')
-
-    # ใส่รูปเล็ก-ใหญ่
-    emmbed.set_thumbnail(url='https://yt3.googleusercontent.com/0qFq3tGT6LVyfLtZc-WCXcV9YyEFQ0M9U5W8qDe36j2xBTN34CJ20dZYQHmBz6aXASmttHI=s900-c-k-c0x00ffffff-no-rj')
-    emmbed.set_image(url='https://i.ytimg.com/vi/KZRa9DQzUpQ/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLCfWDgiBYjFJtrUasd5yxmQZJG_cg')
-
-    # Footer เนื้อหาส่วนท้าย
-    emmbed.set_footer(text='Footer', icon_url='https://yt3.googleusercontent.com/0qFq3tGT6LVyfLtZc-WCXcV9YyEFQ0M9U5W8qDe36j2xBTN34CJ20dZYQHmBz6aXASmttHI=s900-c-k-c0x00ffffff-no-rj')
-
-    await interaction.response.send_message(embed = emmbed)
-
-
-server_on()
-
+# ///////////////////// Start Bot /////////////////////
+server_on()  # ถ้าใช้ Replit/Heroku ให้เปิด Web Server กันหลับ
 bot.run(os.getenv('TOKEN'))
