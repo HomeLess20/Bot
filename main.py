@@ -1,9 +1,9 @@
 import os
 import discord
 from discord.ext import commands
-from discrod import app_commands
+from discord import app_commands
 
-from server import server_on
+from myserver import server_on
 
 bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
 
