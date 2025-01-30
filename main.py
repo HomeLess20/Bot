@@ -103,5 +103,5 @@ async def hellocommand(interaction):
     await interaction.response.send_message("Hello It's me BOT DISCORD")
 
 # ///////////////////// Start Bot /////////////////////
-server_on()  # ถ้าใช้ Replit/Heroku ให้เปิด Web Server กันหลับ
+server_on()  # ถ้าใช้ Replit/Heroku ให้เปิด Web Server กันหลั
 bot.run(os.getenv('TOKEN'))
