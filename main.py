@@ -15,9 +15,7 @@ tz_thailand = pytz.timezone("Asia/Bangkok")
 
 # 🔹 กำหนดเวลาและไฟล์เสียง
 play_schedule = {
-    datetime.time(1, 10): "./song/Fe!n - Travis Scott ft.Playboi carti ｜｜ [edit audio].mp3",   #  เล่นตอน
-    datetime.time(1, 14): "./song/Fe!n - Travis Scott ft.Playboi carti ｜｜ [edit audio].mp3",    # เล่นตอน 12:00 น.
-    datetime.time(18, 0): "evening.mp3"   # เล่นตอน 18:00 น.
+    datetime.time(23,15 ): "./song/VID_20250212_225151.mp3",   #  เล่นตอน
 }
 
 VOICE_CHANNEL_ID = None  # จะเก็บ ID ห้องเสียงที่ผู้ใช้เปิดให้บอทเข้า
