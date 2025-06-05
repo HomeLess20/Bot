@@ -355,7 +355,7 @@ async def leave(ctx):
         VOICE_CHANNEL_ID = None  # ตั้งค่า VOICE_CHANNEL_ID เป็น None เมื่อบอทออกจากห้องเสียง
         await ctx.send("✅ บอทออกจากห้องเสียงแล้ว")
     else:
-        await ctx.send("❌ บอทไม่ได้อยู่ในห้องเสียง")
+        await ctx.send("❌ บอทไม่ได้อยู่ในห้องเสียง.")
 
 # Slash Commands
 @bot.tree.command(name='hellobot', description='Replies with Hello')
