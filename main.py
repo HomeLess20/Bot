@@ -337,6 +337,7 @@ async def join(ctx):
     else:
         await ctx.send("❌ คุณต้องอยู่ในห้องเสียงก่อนที่จะใช้คำสั่งนี้")
 
+
 # คำสั่งให้บอทออกจากห้องเสียง
 @bot.command()
 async def leave(ctx):
