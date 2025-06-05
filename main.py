@@ -312,7 +312,6 @@ async def play_audio(audio_file):
         print("❌ บอทยังไม่ได้เข้าห้องเสียง")
 
 # ///////////////////// Commands /////////////////////
-
 @bot.command()
 async def hello(ctx):
     await ctx.send(f"hello {ctx.author.name}!")
@@ -335,6 +334,7 @@ async def join(ctx):
             return
         
         try:
+            # เชื่อมต่อไปยังห้องเสียง
             vc = await channel.connect()
             VOICE_CHANNEL_ID = channel.id  # เก็บ ID ของห้องเสียง
             await ctx.send(f"✅ บอทเข้าห้องเสียง {channel.name} แล้ว")
@@ -344,8 +344,6 @@ async def join(ctx):
             await ctx.send(f"❌ เกิดข้อผิดพลาด: {e}")
     else:
         await ctx.send("❌ คุณต้องอยู่ในห้องเสียงก่อนที่จะใช้คำสั่งนี้")
-
-
 
 # คำสั่งให้บอทออกจากห้องเสียง
 @bot.command()
