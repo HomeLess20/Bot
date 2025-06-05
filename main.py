@@ -323,19 +323,24 @@ async def test(ctx, arg):
 
 # คำสั่งให้บอทเข้าห้องเสียงที่ผู้ใช้คำสั่งอยู่
 @bot.command()
-async def join(ctx):
-    """ให้บอทเข้าห้องเสียงที่ผู้ใช้คำสั่งอยู่"""
-    global VOICE_CHANNEL_ID  # ใช้ตัวแปร global เพื่ออัปเดตค่า VOICE_CHANNEL_ID
-    if ctx.author.voice:
-        channel = ctx.author.voice.channel  # ห้องเสียงที่ผู้ใช้กำลังอยู่
-        try:
-            vc = await channel.connect()
-            VOICE_CHANNEL_ID = channel.id  # เก็บ ID ของห้องเสียง
-            await ctx.send(f"✅ บอทเข้าห้องเสียง {channel.name} แล้ว")
-        except Exception as e:
-            await ctx.send(f"❌ ไม่สามารถเข้าห้องเสียงได้: {e}")
+async def play_audio(audio_file):
+    """เล่นไฟล์เสียงในห้องเสียง"""
+    if VOICE_CHANNEL_ID:
+        channel = bot.get_channel(VOICE_CHANNEL_ID)
+        if channel and isinstance(channel, discord.VoiceChannel):
+            try:
+                # เช็คห้องเสียงที่เชื่อมต่ออยู่
+                vc = channel.guild.voice_client
+                if vc is not None and not vc.is_playing():
+                    vc.play(discord.FFmpegPCMAudio(audio_file), after=lambda e: print(f"✅ เล่น {audio_file} เสร็จแล้ว"))
+                    while vc.is_playing():
+                        await asyncio.sleep(1)
+            except Exception as e:
+                print(f"❌ Error playing sound: {e}")
+        else:
+            print(f"❌ Voice Channel ID {VOICE_CHANNEL_ID} ไม่ถูกต้อง")
     else:
-        await ctx.send("❌ คุณต้องอยู่ในห้องเสียงก่อนที่จะใช้คำสั่งนี้")
+        print("❌ บอทยังไม่ได้เข้าห้องเสียง")
 
 
 # คำสั่งให้บอทออกจากห้องเสียง
