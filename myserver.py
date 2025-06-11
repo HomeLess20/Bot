@@ -13,3 +13,4 @@ def run():
 def server_on():
     t = Thread(target=run)
     t.start()
+    # Wait for the server to start

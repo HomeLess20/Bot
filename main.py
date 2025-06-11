@@ -357,7 +357,7 @@ async def leave(ctx):
     else:
         await ctx.send("❌ บอทไม่ได้อยู่ในห้องเสียง")
 
-# Slash Commands
+# Slash Commandss
 @bot.tree.command(name='hellobot', description='Replies with Hello')
 async def hellocommand(interaction):
     await interaction.response.send_message("Hello It's me BOT DISCORD")
