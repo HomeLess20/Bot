@@ -312,6 +312,7 @@ async def play_audio(audio_file):
         print("❌ บอทยังไม่ได้เข้าห้องเสียง")
 
 # ///////////////////// Commands /////////////////////
+
 @bot.command()
 async def hello(ctx):
     await ctx.send(f"hello {ctx.author.name}!")
@@ -327,21 +328,12 @@ async def join(ctx):
     global VOICE_CHANNEL_ID  # ใช้ตัวแปร global เพื่ออัปเดตค่า VOICE_CHANNEL_ID
     if ctx.author.voice:
         channel = ctx.author.voice.channel  # ห้องเสียงที่ผู้ใช้กำลังอยู่
-        
-        # ตรวจสอบว่า VOICE_CHANNEL_ID มีค่าแล้ว และห้องเสียงที่กำหนดมีการเชื่อมต่อ
-        if VOICE_CHANNEL_ID == channel.id:
-            await ctx.send(f"❌ บอทอยู่ในห้องเสียง {channel.name} อยู่แล้ว")
-            return
-        
         try:
-            # เชื่อมต่อไปยังห้องเสียง
             vc = await channel.connect()
             VOICE_CHANNEL_ID = channel.id  # เก็บ ID ของห้องเสียง
             await ctx.send(f"✅ บอทเข้าห้องเสียง {channel.name} แล้ว")
-        except discord.errors.ClientException as e:
-            await ctx.send(f"❌ ไม่สามารถเข้าห้องเสียงได้: {e}")
         except Exception as e:
-            await ctx.send(f"❌ เกิดข้อผิดพลาด: {e}")
+            await ctx.send(f"❌ ไม่สามารถเข้าห้องเสียงได้: {e}")
     else:
         await ctx.send("❌ คุณต้องอยู่ในห้องเสียงก่อนที่จะใช้คำสั่งนี้")
 
@@ -357,7 +349,7 @@ async def leave(ctx):
     else:
         await ctx.send("❌ บอทไม่ได้อยู่ในห้องเสียง")
 
-# Slash Commandss
+# Slash Commands
 @bot.tree.command(name='hellobot', description='Replies with Hello')
 async def hellocommand(interaction):
     await interaction.response.send_message("Hello It's me BOT DISCORD")
@@ -365,3 +357,4 @@ async def hellocommand(interaction):
 # ///////////////////// Start Bot /////////////////////
 server_on()  # ถ้าใช้ Replit/Heroku ให้เปิด Web Server กันหลั
 bot.run(os.getenv('TOKEN'))
+
