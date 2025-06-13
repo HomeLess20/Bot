@@ -1,0 +1,33 @@
+name: Deploy & Undeploy on Schedule
+
+on:
+  schedule:
+    - cron: '0 1 * * *'    # Deploy เวลา 8:00 AM (ไทย)
+    - cron: '0 18 * * *'   # Undeploy เวลา 1:00 AM (ไทย)
+  workflow_dispatch:
+
+jobs:
+  scheduled:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Login to Railway
+        run: railway login --apiKey ${{ secrets.RAILWAY_API_KEY }}
+
+      - name: Check time and act
+        run: |
+          HOUR=$(date -u +"%H")
+          if [ "$HOUR" = "01" ]; then
+            echo "🚀 Deploying project (8 AM TH)"
+            railway up
+          elif [ "$HOUR" = "18" ]; then
+            echo "🛑 Undeploying project (1 AM TH)"
+            railway down
+          else
+            echo "No action needed."
+          fi
