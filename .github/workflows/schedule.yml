@@ -1,12 +1,10 @@
-name: Deploy & Undeploy on Schedule
+name: 🧪 Test Railway Deploy Manually
 
 on:
-  schedule:
-    - cron: '0 1-18 * * *'    # ทุกชั่วโมง 8:00 - 01:00 (ไทย)
   workflow_dispatch:
 
 jobs:
-  scheduled:
+  test-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -18,9 +16,10 @@ jobs:
       - name: Set Railway Token
         run: echo "RAILWAY_TOKEN=${{ secrets.RAILWAY_API_KEY }}" >> $GITHUB_ENV
 
-      - name: Check time and act
+      - name: Simulate Deploy at 8 AM TH (01 UTC)
         run: |
-          HOUR=$(date -u +"%H")
+          echo "🕐 Simulating HOUR=01"
+          HOUR="01"
           if [ "$HOUR" = "01" ]; then
             echo "🚀 Deploying project (8 AM TH)"
             railway up
@@ -28,5 +27,5 @@ jobs:
             echo "🛑 Undeploying project (1 AM TH)"
             railway down
           else
-            echo "✅ In-range hour, but no action needed."
+            echo "No action needed."
           fi
