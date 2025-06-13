@@ -1,12 +1,10 @@
-name: Deploy & Undeploy on Schedule
+name: Manual Deploy Now
 
 on:
-  schedule:
-    - cron: '0 20-17 * * *'  # รันทุกชั่วโมงตั้งแต่ UTC 20:00 - 17:00 (เท่ากับไทย 03:00 - 01:00)
   workflow_dispatch:
 
 jobs:
-  scheduled:
+  deploy_now:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,19 +17,8 @@ jobs:
       - name: Set Railway Token
         run: echo "RAILWAY_TOKEN=${{ secrets.RAILWAY_API_KEY }}" >> $GITHUB_ENV
 
-      - name: Link to Railway project
-        run: railway link f30ffa98-b070-49ea-9bdf-d0c2b4ee7d7e  # <-- เปลี่ยน Project ID ได้ตามของคุณ
+      - name: Link to Railway Project
+        run: railway link f30ffa98-b070-49ea-9bdf-d0c2b4ee7d7e  # ใช้ Project ID ของคุณ
 
-      - name: Check time and act
-        run: |
-          HOUR=$(date -u +"%H")
-          echo "🕒 Current UTC hour: $HOUR"
-          if [ "$HOUR" = "01" ]; then
-            echo "🚀 Deploying project (8 AM TH)"
-            railway up
-          elif [ "$HOUR" = "18" ]; then
-            echo "🛑 Undeploying project (1 AM TH)"
-            railway down
-          else
-            echo "✅ In-range hour, but no action needed."
-          fi
+      - name: Deploy project now
+        run: railway up
