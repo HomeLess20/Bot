@@ -1,22 +1,26 @@
-name: 🔧 Test Deploy Right Now
+name: Deploy & Undeploy on Schedule
 
 on:
+  schedule:
+    - cron: '0 20-23,0-18 * * *'  # ทุกชั่วโมง 03:00 - 01:00 (เวลาไทย)
   workflow_dispatch:
 
 jobs:
-  test-deploy:
+  scheduled:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
       - name: Install Railway CLI
         run: npm install -g @railway/cli
 
       - name: Set Railway Token
         run: echo "RAILWAY_TOKEN=${{ secrets.RAILWAY_API_KEY }}" >> $GITHUB_ENV
 
-      - name: 🔁 Simulate 8 AM TH (01 UTC)
+      - name: Check time and act
         run: |
-          echo "🕒 Simulating HOUR=01"
-          HOUR="01"
+          HOUR=$(date -u +"%H")
           if [ "$HOUR" = "01" ]; then
             echo "🚀 Deploying project (8 AM TH)"
             railway up
@@ -25,4 +29,3 @@ jobs:
             railway down
           else
             echo "✅ In-range hour, but no action needed."
-          fi
