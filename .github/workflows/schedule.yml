@@ -2,7 +2,7 @@ name: Deploy & Undeploy on Schedule
 
 on:
   schedule:
-    - cron: '0 20-23,0-18 * * *'  # ทุกชั่วโมง 03:00 - 01:00 (เวลาไทย)
+    - cron: '0 * * * *'    # ทุกชั่วโมง (เพื่อเทส)
   workflow_dispatch:
 
 jobs:
@@ -21,11 +21,10 @@ jobs:
       - name: Check time and act
         run: |
           HOUR=$(date -u +"%H")
-          if [ "$HOUR" = "01" ]; then
-            echo "🚀 Deploying project (8 AM TH)"
+          echo "🕒 Current UTC hour: $HOUR"
+          if [ "$HOUR" -ge 18 ] || [ "$HOUR" -le 01 ]; then
+            echo "🚀 Deploying project (TH 3:00–1:00)"
             railway up
-          elif [ "$HOUR" = "18" ]; then
-            echo "🛑 Undeploying project (1 AM TH)"
-            railway down
           else
-            echo "✅ In-range hour, but no action needed."
+            echo "❌ Outside deploy range."
+          fi
