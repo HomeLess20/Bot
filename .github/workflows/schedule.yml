@@ -2,16 +2,12 @@ name: Deploy & Undeploy on Schedule
 
 on:
   schedule:
-    - cron: '0 1 * * *'    # 8:00 AM (ไทย)
-    - cron: '0 18 * * *'   # 1:00 AM (ไทย)
-  workflow_dispatch:       # ให้กดรันเองได้ด้วย (manual)
+    - cron: '0 1-18 * * *'    # ทุกชั่วโมง 8:00 - 01:00 (ไทย)
+  workflow_dispatch:
 
 jobs:
   scheduled:
     runs-on: ubuntu-latest
-    env:
-      RAILWAY_TOKEN: ${{ secrets.RAILWAY_API_KEY }}  # ใช้ secrets API KEY แบบใหม่
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -20,15 +16,11 @@ jobs:
         run: npm install -g @railway/cli
 
       - name: Set Railway Token
-        run: railway login --token $RAILWAY_TOKEN
+        run: echo "RAILWAY_TOKEN=${{ secrets.RAILWAY_API_KEY }}" >> $GITHUB_ENV
 
-      - name: Simulate Deploy/Undeploy
+      - name: Check time and act
         run: |
-          echo "⏰ Simulating current UTC hour..."
           HOUR=$(date -u +"%H")
-
-          echo "🕐 HOUR=$HOUR"
-
           if [ "$HOUR" = "01" ]; then
             echo "🚀 Deploying project (8 AM TH)"
             railway up
@@ -36,5 +28,5 @@ jobs:
             echo "🛑 Undeploying project (1 AM TH)"
             railway down
           else
-            echo "ℹ️ No action needed."
+            echo "✅ In-range hour, but no action needed."
           fi
