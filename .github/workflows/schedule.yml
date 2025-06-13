@@ -1,13 +1,31 @@
-- name: Simulate Deploy at 8 AM TH (01 UTC)
-  run: |
-    echo "🕐 Simulating HOUR=01"
-    HOUR="01"
-    if [ "$HOUR" = "01" ]; then
-      echo "🚀 Deploying project (8 AM TH)"
-      railway up --project <YOUR_PROJECT_ID>
-    elif [ "$HOUR" = "18" ]; then
-      echo "🛑 Undeploying project (1 AM TH)"
-      railway down --project <YOUR_PROJECT_ID>
-    else
-      echo "No action needed."
-    fi
+name: 🔁 Simulate Deploy/Undeploy
+
+on:
+  workflow_dispatch:  # เรียกด้วยมือจาก GitHub Actions UI
+
+jobs:
+  simulate:
+    runs-on: ubuntu-latest
+    env:
+      PROJECT_ID: f30ffa98-b070-49ea-9bdf-d0c2b4ee7d7e  # ใส่ Project ID ที่คุณมี
+
+    steps:
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Set Railway Token
+        run: railway login --apiKey ${{ secrets.RAILWAY_API_KEY }}
+
+      - name: 🔁 Simulate Deploy at 8 AM TH (01 UTC)
+        run: |
+          echo "🕐 Simulating HOUR=01"
+          HOUR="01"
+          if [ "$HOUR" = "01" ]; then
+            echo "🚀 Deploying project (8 AM TH)"
+            railway up --project $PROJECT_ID
+          elif [ "$HOUR" = "18" ]; then
+            echo "🛑 Undeploying project (1 AM TH)"
+            railway down --project $PROJECT_ID
+          else
+            echo "No action needed."
+          fi
