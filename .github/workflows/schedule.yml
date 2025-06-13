@@ -1,22 +1,20 @@
 name: 🔁 Simulate Deploy/Undeploy
 
 on:
-  workflow_dispatch:  # เรียกด้วยมือจาก GitHub Actions UI
+  workflow_dispatch:
 
 jobs:
   simulate:
     runs-on: ubuntu-latest
     env:
-      PROJECT_ID: f30ffa98-b070-49ea-9bdf-d0c2b4ee7d7e  # ใส่ Project ID ที่คุณมี
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_API_KEY }}
+      PROJECT_ID: f30ffa98-b070-49ea-9bdf-d0c2b4ee7d7e  # แทนที่ด้วยของคุณ
 
     steps:
       - name: Install Railway CLI
         run: npm install -g @railway/cli
 
-      - name: Set Railway Token
-        run: railway login --apiKey ${{ secrets.RAILWAY_API_KEY }}
-
-      - name: 🔁 Simulate Deploy at 8 AM TH (01 UTC)
+      - name: Simulate Deploy at 8 AM TH (01 UTC)
         run: |
           echo "🕐 Simulating HOUR=01"
           HOUR="01"
