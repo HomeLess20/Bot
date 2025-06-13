@@ -1,7 +1,7 @@
-name: Manual Deploy Now
+name: Deploy Now
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:  # ให้สามารถกด run เองได้จาก GitHub Actions UI
 
 jobs:
   deploy_now:
@@ -17,8 +17,7 @@ jobs:
       - name: Set Railway Token
         run: echo "RAILWAY_TOKEN=${{ secrets.RAILWAY_API_KEY }}" >> $GITHUB_ENV
 
-      - name: Link to Railway Project
-        run: railway link f30ffa98-b070-49ea-9bdf-d0c2b4ee7d7e  # ใช้ Project ID ของคุณ
-
-      - name: Deploy project now
-        run: railway up
+      - name: Deploy to Railway (no link needed)
+        run: |
+          echo "🚀 Deploying now..."
+          railway up --project f30ffa98-b070-49ea-9bdf-d0c2b4ee7d7e
