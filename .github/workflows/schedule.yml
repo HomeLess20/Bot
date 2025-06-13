@@ -1,31 +1,13 @@
-name: 🧪 Test Railway Deploy Manually
-
-on:
-  workflow_dispatch:
-
-jobs:
-  test-deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Install Railway CLI
-        run: npm install -g @railway/cli
-
-      - name: Set Railway Token
-        run: echo "RAILWAY_TOKEN=${{ secrets.RAILWAY_API_KEY }}" >> $GITHUB_ENV
-
-      - name: Simulate Deploy at 8 AM TH (01 UTC)
-        run: |
-          echo "🕐 Simulating HOUR=01"
-          HOUR="01"
-          if [ "$HOUR" = "01" ]; then
-            echo "🚀 Deploying project (8 AM TH)"
-            railway up
-          elif [ "$HOUR" = "18" ]; then
-            echo "🛑 Undeploying project (1 AM TH)"
-            railway down
-          else
-            echo "No action needed."
-          fi
+- name: Simulate Deploy at 8 AM TH (01 UTC)
+  run: |
+    echo "🕐 Simulating HOUR=01"
+    HOUR="01"
+    if [ "$HOUR" = "01" ]; then
+      echo "🚀 Deploying project (8 AM TH)"
+      railway up --project <YOUR_PROJECT_ID>
+    elif [ "$HOUR" = "18" ]; then
+      echo "🛑 Undeploying project (1 AM TH)"
+      railway down --project <YOUR_PROJECT_ID>
+    else
+      echo "No action needed."
+    fi
