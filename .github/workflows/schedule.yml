@@ -2,8 +2,7 @@ name: Deploy & Undeploy on Schedule
 
 on:
   schedule:
-    - cron: '0 1 * * *'    # Deploy เวลา 8:00 AM (ไทย)
-    - cron: '0 18 * * *'   # Undeploy เวลา 1:00 AM (ไทย)
+    - cron: '0 1-18 * * *'    # ทุกชั่วโมง 8:00 - 01:00 (ไทย)
   workflow_dispatch:
 
 jobs:
@@ -29,5 +28,5 @@ jobs:
             echo "🛑 Undeploying project (1 AM TH)"
             railway down
           else
-            echo "No action needed."
+            echo "✅ In-range hour, but no action needed."
           fi
