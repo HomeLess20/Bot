@@ -295,11 +295,22 @@ async def ensure_voice(channel: discord.VoiceChannel) -> discord.VoiceClient:
 @bot.event
 async def on_ready():
     print(f"✅ {bot.user} has connected to Discord!")
+    # เช็ก Opus
+    print("Opus loaded:", discord.opus.is_loaded())
+
     try:
-        await bot.tree.sync()
+        synced = await bot.tree.sync()
+        print(f"🔧 Slash commands synced: {len(synced)}")
     except Exception as e:
-        print("Slash sync error:", e)
-    play_sound_at_time.start()  # เริ่ม Task ตรวจสอบเวลาเล่นเสียง
+        # โชว์ stacktrace จะได้ไล่ง่าย
+        import traceback
+        traceback.print_exc()
+        print("Slash sync error:", repr(e))
+
+    # on_ready อาจถูกเรียกซ้ำตอน reconnect -> เช็กก่อนค่อย start
+    if not play_sound_at_time.is_running():
+        play_sound_at_time.start()
+
 
 @tasks.loop(seconds=2)  # 🔹 ตรวจสอบเวลาทุก 2 วินาที
 async def play_sound_at_time():
