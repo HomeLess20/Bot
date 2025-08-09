@@ -1,26 +1,17 @@
+# ✅ Base image จาก Python ที่รองรับ pip และ apt
 FROM python:3.11-slim
 
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-ENV TZ=Asia/Bangkok
-ENV FFMPEG_PATH=/usr/bin/ffmpeg
+# ✅ ติดตั้ง ffmpeg
+RUN apt update && apt install -y ffmpeg
 
-# System deps: libopus สำหรับเสียง + ffmpeg สำหรับเล่นไฟล์
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libopus0 \
-    ffmpeg \
-    libsodium23 \
-    ca-certificates \
- && rm -rf /var/lib/apt/lists/*
-
+# ✅ ตั้ง working directory
 WORKDIR /app
 
-# Python deps
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# App code
+# ✅ คัดลอกไฟล์ทั้งหมดไปยัง container
 COPY . .
 
-# Run
+# ✅ ติดตั้ง dependency จาก requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+# ✅ รัน bot
 CMD ["python", "main.py"]
