@@ -309,12 +309,26 @@ play_schedule = {
 @bot.event
 async def on_ready():
     print(f"✅ {bot.user} has connected to Discord!")
+
+    # โหลด/เช็ก Opus ให้ชัวร์ และพิมพ์สถานะออก log
     ensure_opus_loaded()
+    print("Opus loaded:", discord.opus.is_loaded())
+
+    # sync slash (จับ error ไว้)
     try:
         await bot.tree.sync()
     except Exception as e:
         print("Slash sync error:", e)
-    play_sound_at_time.start()
+
+    # รอทุกอย่างพร้อมก่อนค่อยสตาร์ท task และกันสตาร์ทซ้ำตอน reconnect
+    await bot.wait_until_ready()
+    await asyncio.sleep(1)
+    if not play_sound_at_time.is_running():
+        play_sound_at_time.start()
+        print("⏱️ play_sound_at_time started")
+    else:
+        print("⏱️ play_sound_at_time already running")
+
 
 @tasks.loop(seconds=2)
 async def play_sound_at_time():
@@ -324,6 +338,7 @@ async def play_sound_at_time():
         if now.hour == play_time.hour and now.minute == play_time.minute:
             await play_audio(sound_file)
             await asyncio.sleep(60)  # กันเล่นซ้ำในนาทีเดียวกัน
+
 
 async def play_audio(audio_file: str):
     """เล่นไฟล์เสียงในห้องเสียง (auto-join ถ้ายังไม่ต่อ)"""
@@ -353,6 +368,7 @@ async def play_audio(audio_file: str):
             print("ℹ️ กำลังเล่นเสียงอยู่ ข้ามไฟล์นี้")
     except Exception as e:
         print(f"❌ Error playing sound: {e}")
+
 
 # -------------------- Text Commands --------------------
 @bot.command()
